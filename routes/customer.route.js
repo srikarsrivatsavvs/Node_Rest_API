@@ -8,7 +8,7 @@ module.exports = app => {
     "/api/customer_signup",
     //validators for request body fields
     [
-      body("first_name", "enter valid first name")
+      body("first_name", "First name should contain 1 to 15 characters only")
         .trim()
         .isLength({ min: 1, max: 15 }),
       body("last_name", "enter valid last name")
