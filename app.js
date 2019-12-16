@@ -1,23 +1,53 @@
-//third party imports
 const express = require("express");
 const bodyParser = require("body-parser");
-
-// instantiate express app
 const app = express();
+var path = require("path");
+var fs = require("fs");
+const cloudinary = require("cloudinary");
+global.__basedir = __dirname;
 
-// middleware that only parses json
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: "10mb", extended: true }));
+app.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
 
-//this middleware sets the appropriate headers for responses to avoid CORS erros.
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, PATCH, DELETE"
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
   );
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   next();
 });
 
-//server running on port 80
-app.listen(3000);
+require("./routes/customer.route")(app);
+require("./routes/caterer.route")(app);
+require("./routes/menu.route")(app);
+require("./routes/cart.route")(app);
+require("./routes/order.route")(app);
+
+app.get("/", (req, res) => {
+  res.send("Welcome");
+});
+
+const mongoose = require("mongoose");
+// Your Mongo Atlas Cluster
+// Create a Project on Mongo Atlas and Create a Cluster and than configure it
+let dev_db_url =
+  // "mongodb+srv://<username>:<password>@cluster0-zevrx.mongodb.net/test?retryWrites=true&w=majority";
+  "mongodb://127.0.0.1:27017/catersmart";
+
+const mongoDB = process.env.MONGODB_URI || dev_db_url;
+mongoose
+  .connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log("MongoDB connected…"))
+  .catch(err => console.log(err));
+
+app.listen(process.env.PORT || 4000);
+
+// Please create your account on cloudinary and find following keys from Dashboard.
+// Make Sure you verified your account via Email after creating to work it properly.
+cloudinary.config({
+  cloud_name: "premshamsundar",
+  api_key: "425991328347625",
+  api_secret: "4Z4-DI9OAScG2SP8dZzBDtzCAbQ"
+});
