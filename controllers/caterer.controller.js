@@ -1,6 +1,8 @@
 const Caterer = require('../models/Caterer');
 const cloudinary = require('cloudinary');
 
+const { validationResult } = require("express-validator");
+
 var imgUrl = null;
 var urlImage = null;
 
@@ -18,6 +20,14 @@ async function uploadImage(image){
 
 // Caterer Registration
 exports.signup = async (req, res) => {
+
+    const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({
+      message: "Server side validation failed",
+      errors: errors.array()
+    });
+  }
 
     // Check if Caterer Already Exists with same Email
     console.log(req.body)
