@@ -1,15 +1,22 @@
+//minimalist web framework for node
 const express = require("express");
+//request body parsing middleware.
 const bodyParser = require("body-parser");
+//creat the app
 const app = express();
-var path = require("path");
-var fs = require("fs");
+//built-in module To handle file paths
+// var path = require("path");
+//built-in module To handle the file system
+// var fs = require("fs");
 const cloudinary = require("cloudinary");
+//global object called __basedir scop is anywhere in the project
 global.__basedir = __dirname;
-
+// middleware that only parses json
 app.use(bodyParser.json({ limit: "10mb", extended: true }));
+//middleware that only parses urlencoded bodies
 app.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
-
-app.use(function(req, res, next) {
+//
+app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE");
   res.header(
@@ -28,7 +35,7 @@ require("./routes/order.route")(app);
 app.get("/", (req, res) => {
   res.send("Welcome");
 });
-
+//ODM for mongoDB (a NoSQL DB)
 const mongoose = require("mongoose");
 // Your Mongo Atlas Cluster
 // Create a Project on Mongo Atlas and Create a Cluster and than configure it
