@@ -12,12 +12,12 @@ exports.signup = async (req, res) => {
     });
   }
   // Check if Customer Already Exists with same Email
-  await Customer.find({ email: req.body.email })
+  await Customer.find({$or: [{email: req.body.email }, {phone: req.body.phone }]})
     .then(count => {
       if (count.length > 0) {
         res.json({
           status: "failed",
-          message: "Email Already Exists"
+          message: "Email or Phone Already Exists"
         });
       } else {
         const customer = new Customer({
@@ -27,6 +27,8 @@ exports.signup = async (req, res) => {
           password: req.body.password,
           phone: req.body.phone
         });
+
+
 
         // Register Customer
 
