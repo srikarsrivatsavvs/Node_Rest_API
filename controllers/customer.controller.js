@@ -143,6 +143,12 @@ exports.customers = async (req, res) => {
 
 // Update Customer
 exports.update_customer = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({
+      message: "Server side validation failed",
+      errors: errors.array()
+    });}
   await Customer.findByIdAndUpdate(
     req.params.id,
     { $set: req.body },
