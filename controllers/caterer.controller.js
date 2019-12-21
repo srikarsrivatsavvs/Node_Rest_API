@@ -144,6 +144,13 @@ exports.login = async (req, res) => {
 // Caterer Details
 
 exports.caterer_details = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({
+      message: "Server side validation failed",
+      errors: errors.array()
+    });
+  }
   await Caterer.findOne({ _id: req.params.id })
     .then(result => {
       if (result) {
@@ -229,6 +236,13 @@ exports.update_caterer = async (req, res) => {
 // Delete Caterer
 
 exports.delete_caterer = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({
+      message: "Server side validation failed",
+      errors: errors.array()
+    });
+  }
   await Caterer.findByIdAndDelete(req.params.id)
     .then(result => {
       if (result) {

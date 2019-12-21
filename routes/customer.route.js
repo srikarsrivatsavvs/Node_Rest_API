@@ -1,8 +1,6 @@
 module.exports = app => {
   const customer_controller = require("../controllers/customer.controller");
   const Customer = require("../models/Customer");
-  const mongoose = require("mongoose");
-  const { ObjectId } = mongoose.Types;
   const { body, check } = require("express-validator");
 
   // Customer Registration
