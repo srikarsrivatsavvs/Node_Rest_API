@@ -12,7 +12,9 @@ exports.signup = async (req, res) => {
     });
   }
   // Check if Customer Already Exists with same Email
-  await Customer.find({$or: [{email: req.body.email }, {phone: req.body.phone }]})
+  await Customer.find({
+    $or: [{ email: req.body.email }, { phone: req.body.phone }]
+  })
     .then(count => {
       if (count.length > 0) {
         res.json({
@@ -27,8 +29,6 @@ exports.signup = async (req, res) => {
           password: req.body.password,
           phone: req.body.phone
         });
-
-
 
         // Register Customer
 
@@ -150,7 +150,8 @@ exports.update_customer = async (req, res) => {
     return res.status(422).json({
       message: "Server side validation failed",
       errors: errors.array()
-    });}
+    });
+  }
   await Customer.findByIdAndUpdate(
     req.params.id,
     { $set: req.body },
@@ -180,6 +181,13 @@ exports.update_customer = async (req, res) => {
 
 // Delete Customer
 exports.delete_customer = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({
+      message: "Server side validation failed",
+      errors: errors.array()
+    });
+  }
   await Customer.findByIdAndDelete(req.params.id)
     .then(result => {
       if (result) {
