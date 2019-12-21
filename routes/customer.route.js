@@ -43,7 +43,29 @@ module.exports = app => {
   );
 
   // Customer Details
-  app.get("/api/customer_details/:id", customer_controller.customer_details);
+  app.get(
+    "/api/customer_details/:id", //validators for request body fields
+    [
+      //check the id field in req.param
+      check("id").custom(customerId => {
+        // console.log(customerId);
+        //look for the id in the Customer collection
+        return Customer.findById(customerId)
+          .then(customer => {
+            //if you found a customer
+            if (customer !== null) {
+              //validation successful
+              return true;
+            } else {
+              //validation failed
+              return Promise.reject("Invalid customer Id");
+            }
+          })
+          .catch();
+      })
+    ],
+    customer_controller.customer_details
+  );
 
   // All Customers
   app.get("/api/customers", customer_controller.customers);

@@ -99,6 +99,13 @@ exports.login = async (req, res) => {
 
 // Customer Details
 exports.customer_details = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({
+      message: "Server side validation failed",
+      errors: errors.array()
+    });
+  }
   await Customer.findOne({ _id: req.params.id })
     .then(result => {
       if (result) {
