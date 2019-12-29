@@ -1,5 +1,7 @@
 const Customer = require("../models/Customer");
-
+//jsonwebtokens module for generating auth tokens
+const jwt = require("jsonwebtoken");
+//validationResult for catching validation erros from express-validator middleware
 const { validationResult } = require("express-validator");
 // Customer Signup
 
@@ -73,11 +75,18 @@ exports.login = async (req, res) => {
   })
     .then(result => {
       if (result) {
+        // console.log(result);
+        const token = jwt.sign(
+          { email: result.email, userId: result._id },
+          "secret",
+          { expiresIn: "1h" }
+        );
         // If Customer Exists
         res.json({
           status: "success",
           message: "Login Successfull",
-          data: result
+          token: token,
+          userId: result._id.toString()
         });
       } else {
         // If Customer doesn't Exists

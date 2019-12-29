@@ -21,7 +21,7 @@ app.use((req, res, next) => {
   res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE");
   res.header(
     "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
+    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
   );
   next();
 });
@@ -41,7 +41,7 @@ const mongoose = require("mongoose");
 // Create a Project on Mongo Atlas and Create a Cluster and than configure it
 let dev_db_url =
   // "mongodb+srv://<username>:<password>@cluster0-zevrx.mongodb.net/test?retryWrites=true&w=majority";
-  "mongodb://35.200.243.49:27017/catersmart";
+  "mongodb://127.0.0.1:27017/catersmart";
 
 const mongoDB = process.env.MONGODB_URI || dev_db_url;
 mongoose

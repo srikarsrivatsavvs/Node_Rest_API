@@ -2,10 +2,12 @@ module.exports = app => {
   const customer_controller = require("../controllers/customer.controller");
   const Customer = require("../models/Customer");
   const { body, check } = require("express-validator");
-
+  const isAuth = require("../middleware/is-auth");
   // Customer Registration
   app.post(
     "/api/customer_signup",
+    //Authentication middleware
+    // isAuth,
     //validators for request body fields
     [
       body("first_name", "Invalid First name, enter 1 to 15 characters only")
@@ -42,7 +44,10 @@ module.exports = app => {
 
   // Customer Details
   app.get(
-    "/api/customer_details/:id", //validators for request body fields
+    "/api/customer_details/:id",
+    //Authentication middleware
+    isAuth,
+    //validators for request body fields
     [
       //check the id field in req.param
       check("id").custom(customerId => {
@@ -59,7 +64,10 @@ module.exports = app => {
               return Promise.reject("Invalid customer Id");
             }
           })
-          .catch();
+          .catch(err => {
+            err.statusCode = 500;
+            throw err;
+          });
       })
     ],
     customer_controller.customer_details
@@ -71,6 +79,8 @@ module.exports = app => {
   // Update Customer
   app.put(
     "/api/update_customer/:id",
+    //Authentication middleware
+    isAuth,
     //validators for request body fields
     [
       //check the id field in req.param
@@ -87,7 +97,10 @@ module.exports = app => {
               return Promise.reject("Invalid customer Id");
             }
           })
-          .catch();
+          .catch(err => {
+            err.statusCode = 500;
+            throw err;
+          });
       }),
       body("first_name", "Invalid First name, enter 1 to 15 characters only")
         .trim()
@@ -110,6 +123,9 @@ module.exports = app => {
   // Delete Customer
   app.delete(
     "/api/delete_customer/:id",
+    //Authentication middleware
+    isAuth,
+    //validation middleware
     [
       //check the id field in req.param
       check("id").custom(customerId => {
@@ -125,7 +141,10 @@ module.exports = app => {
               return Promise.reject("Invalid customer Id");
             }
           })
-          .catch();
+          .catch(err => {
+            err.statusCode = 500;
+            throw err;
+          });
       })
     ],
     customer_controller.delete_customer
