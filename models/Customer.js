@@ -9,6 +9,7 @@ let customerSchema = new Schema({
   email: { type: String, required: true },
   password: { type: String, required: true },
   phone: { type: String, required: true },
+  verified: { type: Boolean, required: true },
   cart: [
     {
       menu_id: {

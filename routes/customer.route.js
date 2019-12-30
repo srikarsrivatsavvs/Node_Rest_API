@@ -1,7 +1,7 @@
 module.exports = app => {
   const customer_controller = require("../controllers/customer.controller");
   const Customer = require("../models/Customer");
-  const { body, check } = require("express-validator");
+  const { body } = require("express-validator");
   const isAuth = require("../middleware/is-auth");
   // Customer Registration
   app.post(
@@ -44,32 +44,9 @@ module.exports = app => {
 
   // Customer Details
   app.get(
-    "/api/customer_details/:id",
+    "/api/customer_details/",
     //Authentication middleware
     isAuth,
-    //validators for request body fields
-    [
-      //check the id field in req.param
-      check("id").custom(customerId => {
-        // console.log(customerId);
-        //look for the id in the Customer collection
-        return Customer.findById(customerId)
-          .then(customer => {
-            //if you found a customer
-            if (customer !== null) {
-              //validation successful
-              return true;
-            } else {
-              //validation failed
-              return Promise.reject("Invalid customer Id");
-            }
-          })
-          .catch(err => {
-            err.statusCode = 500;
-            throw err;
-          });
-      })
-    ],
     customer_controller.customer_details
   );
 
@@ -78,30 +55,11 @@ module.exports = app => {
 
   // Update Customer
   app.put(
-    "/api/update_customer/:id",
+    "/api/update_customer/",
     //Authentication middleware
     isAuth,
     //validators for request body fields
     [
-      //check the id field in req.param
-      check("id").custom(customerId => {
-        //look for the id in the Customer collection
-        return Customer.findById(customerId)
-          .then(customer => {
-            //if you found a customer
-            if (customer !== null) {
-              //validation successful
-              return true;
-            } else {
-              //validation failed
-              return Promise.reject("Invalid customer Id");
-            }
-          })
-          .catch(err => {
-            err.statusCode = 500;
-            throw err;
-          });
-      }),
       body("first_name", "Invalid First name, enter 1 to 15 characters only")
         .trim()
         .isLength({ min: 1, max: 15 }),
@@ -122,31 +80,9 @@ module.exports = app => {
 
   // Delete Customer
   app.delete(
-    "/api/delete_customer/:id",
+    "/api/delete_customer/",
     //Authentication middleware
     isAuth,
-    //validation middleware
-    [
-      //check the id field in req.param
-      check("id").custom(customerId => {
-        //look for the id in the Customer collection
-        return Customer.findById(customerId)
-          .then(customer => {
-            //if you found a customer
-            if (customer !== null) {
-              //validation successful
-              return true;
-            } else {
-              //validation failed
-              return Promise.reject("Invalid customer Id");
-            }
-          })
-          .catch(err => {
-            err.statusCode = 500;
-            throw err;
-          });
-      })
-    ],
     customer_controller.delete_customer
   );
 };

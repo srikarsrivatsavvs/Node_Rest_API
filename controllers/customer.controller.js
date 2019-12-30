@@ -29,7 +29,8 @@ exports.signup = async (req, res) => {
           last_name: req.body.last_name,
           email: req.body.email,
           password: req.body.password,
-          phone: req.body.phone
+          phone: req.body.phone,
+          verified: false
         });
 
         // Register Customer
@@ -108,14 +109,7 @@ exports.login = async (req, res) => {
 
 // Customer Details
 exports.customer_details = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(422).json({
-      message: "Server side validation failed",
-      errors: errors.array()
-    });
-  }
-  await Customer.findOne({ _id: req.params.id })
+  await Customer.findOne({ _id: req.userId })
     .then(result => {
       if (result) {
         res.json({
@@ -161,15 +155,8 @@ exports.customers = async (req, res) => {
 
 // Update Customer
 exports.update_customer = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(422).json({
-      message: "Server side validation failed",
-      errors: errors.array()
-    });
-  }
   await Customer.findByIdAndUpdate(
-    req.params.id,
+    req.userId,
     { $set: req.body },
     (err, customer) => {
       if (err) {
@@ -197,14 +184,7 @@ exports.update_customer = async (req, res) => {
 
 // Delete Customer
 exports.delete_customer = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(422).json({
-      message: "Server side validation failed",
-      errors: errors.array()
-    });
-  }
-  await Customer.findByIdAndDelete(req.params.id)
+  await Customer.findByIdAndDelete(req.userId)
     .then(result => {
       if (result) {
         res.json({
