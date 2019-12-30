@@ -3,7 +3,7 @@ module.exports = app => {
   const upload = require("../config/caterer_image.config.js");
   const Caterer = require("../models/Caterer");
   const { body, check } = require("express-validator");
-
+  const isAuth = require("../middleware/is-auth");
   // caterer Registration
   app.post(
     "/api/caterer_signup",
@@ -34,26 +34,9 @@ module.exports = app => {
 
   // caterer Details
   app.get(
-    "/api/caterer_details/:id",
-    [
-      //check the id field in req.param
-      check("id").custom(catererId => {
-        // console.log(catererId);
-        //look for the id in the Caterer collection
-        return Caterer.findById(catererId)
-          .then(Caterer => {
-            //if you found a Caterer
-            if (Caterer !== null) {
-              //validation successful
-              return true;
-            } else {
-              //validation failed
-              return Promise.reject("Invalid Caterer Id");
-            }
-          })
-          .catch();
-      })
-    ],
+    "/api/caterer_details/",
+    //Authentication middleware
+    isAuth,
     caterer_controller.caterer_details
   );
 
@@ -62,27 +45,12 @@ module.exports = app => {
 
   // Update caterer
   app.put(
-    "/api/update_caterer/:id",
+    "/api/update_caterer/",
     upload.single("image"),
+    //Authentication middleware
+    isAuth,
     //Caterer field validations
     [
-      //check the id field in req.param
-      check("id").custom(catererId => {
-        // console.log(catererId);
-        //look for the id in the Caterer collection
-        return Caterer.findById(catererId)
-          .then(Caterer => {
-            //if you found a Caterer
-            if (Caterer !== null) {
-              //validation successful
-              return true;
-            } else {
-              //validation failed
-              return Promise.reject("Invalid Caterer Id");
-            }
-          })
-          .catch();
-      }),
       body("name", "Invalid name, enter 1 to 15 characters only")
         .trim()
         .isLength({ min: 1, max: 15 }),
@@ -103,26 +71,9 @@ module.exports = app => {
 
   // Delete caterer
   app.delete(
-    "/api/delete_caterer/:id",
-    [
-      //check the id field in req.param
-      check("id").custom(catererId => {
-        // console.log(catererId);
-        //look for the id in the Caterer collection
-        return Caterer.findById(catererId)
-          .then(Caterer => {
-            //if you found a Caterer
-            if (Caterer !== null) {
-              //validation successful
-              return true;
-            } else {
-              //validation failed
-              return Promise.reject("Invalid Caterer Id");
-            }
-          })
-          .catch();
-      })
-    ],
+    "/api/delete_caterer/",
+    //Authentication middleware
+    isAuth,
     caterer_controller.delete_caterer
   );
 };
