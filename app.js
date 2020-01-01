@@ -31,7 +31,7 @@ require("./routes/caterer.route")(app);
 require("./routes/menu.route")(app);
 require("./routes/cart.route")(app);
 require("./routes/order.route")(app);
-
+require("./routes/admin.route")(app);
 app.get("/", (req, res) => {
   res.send("Welcome");
 });
