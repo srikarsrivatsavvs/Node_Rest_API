@@ -14,7 +14,6 @@ global.__basedir = __dirname;
 // middleware that only parses json
 app.use(bodyParser.json({ limit: "10mb", extended: true }));
 //middleware that only parses urlencoded bodies
-app.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
 //
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -26,12 +25,15 @@ app.use((req, res, next) => {
   next();
 });
 
+require("./routes/admin.route")(app);
+
+app.use(bodyParser.urlencoded({ limit: "10mb", extended: true }));
+
 require("./routes/customer.route")(app);
 require("./routes/caterer.route")(app);
 require("./routes/menu.route")(app);
 require("./routes/cart.route")(app);
 require("./routes/order.route")(app);
-require("./routes/admin.route")(app);
 app.get("/", (req, res) => {
   res.send("Welcome");
 });
