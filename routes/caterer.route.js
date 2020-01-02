@@ -14,17 +14,33 @@ module.exports = app => {
       body("name", "Invalid name, enter 1 to 15 characters only")
         .trim()
         .isLength({ min: 1, max: 15 }),
-      body("description", "Invalid Description, enter 1 to 50 characters")
+      body("email", "Enter valid email").isEmail(),
+      body("description", "Invalid Description, enter 1 to 300 characters")
         .trim()
-        .isLength({ min: 1, max: 50 }),
+        .isLength({ min: 1, max: 300 }),
       body(
         "password",
         "Password should be combination of one uppercase , one lower case, one special char, one digit and min 8 , max 15 char long"
       ).matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/, "i"),
-      body("email", "Enter valid email").isEmail(),
       body("phone", "Enter a valid phone number")
         .isMobilePhone()
-        .isLength({ min: 10, max: 10 })
+        .isLength({ min: 10, max: 10 }),
+      body(
+        "minimum_order_quantity",
+        "Enter a valid number for minimum order quantity"
+      ).isInt({ gt: 0 }),
+      body("availability", "Enter a boolean value").isBoolean(),
+      body("live_kitchen", "Enter a boolean value").isBoolean(),
+      body("delivery_fee", "Enter a valid amount for delivery fee").isInt({
+        gt: 0
+      }),
+      body(
+        "lead_time",
+        "Enter a valid number of hours for lead time, it should be more than 24"
+      ).isInt({
+        gt: 24
+      }),
+      body("menu_starting_from", "Enter a valid amount").isInt({ gt: 0 })
     ],
     caterer_controller.signup
   );
