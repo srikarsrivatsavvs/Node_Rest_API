@@ -46,10 +46,11 @@ let dev_db_url =
 const mongoDB = process.env.MONGODB_URI || dev_db_url;
 mongoose
   .connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("MongoDB connected…"))
+  .then(() => {
+    console.log("MongoDB connected…");
+    app.listen(process.env.PORT || 4000);
+  })
   .catch(err => console.log(err));
-
-app.listen(process.env.PORT || 4000);
 
 // Please create your account on cloudinary and find following keys from Dashboard.
 // Make Sure you verified your account via Email after creating to work it properly.
