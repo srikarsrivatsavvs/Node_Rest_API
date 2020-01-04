@@ -17,4 +17,4 @@ let catererSchema = new Schema({
   live_kitchen: { type: Boolean, required: true },
   image: { type: String, required: true }
 });
-module.exports = mongoose.model("caterers", catererSchema);
+module.exports = mongoose.model("Caterer", catererSchema);

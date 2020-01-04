@@ -6,7 +6,7 @@ mongoose.set("useFindAndModify", false);
 const cartSchema = new Schema({
   menu_id: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Menus",
+    ref: "Menu",
     required: true
   },
   quantity: { type: Number, required: true }
@@ -22,4 +22,4 @@ const customerSchema = new Schema({
   cart: [cartSchema]
 });
 
-module.exports = mongoose.model("customers", customerSchema);
+module.exports = mongoose.model("Customer", customerSchema);
