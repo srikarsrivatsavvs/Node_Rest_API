@@ -18,8 +18,10 @@ const customerSchema = new Schema({
   email: { type: String, required: true },
   password: { type: String, required: true },
   phone: { type: String, required: true },
-  verified: { type: Boolean, required: true },
-  cart: [cartSchema]
+  verified: { type: Boolean, required: true, default: false },
+  cart: [cartSchema],
+  resetToken: { type: String },
+  resetTokenExpiration: { type: Date }
 });
 
 module.exports = mongoose.model("Customer", customerSchema);

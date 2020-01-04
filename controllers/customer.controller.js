@@ -1,10 +1,14 @@
 const Customer = require("../models/Customer");
+const Token = require("../models/Token");
 //jsonwebtokens module for generating auth tokens
 const jwt = require("jsonwebtoken");
 //validationResult for catching validation erros from express-validator middleware
 const { validationResult } = require("express-validator");
+//email transporter
+const { transporter } = require("../util/emailer");
+//random token generator
+const crypto = require("crypto");
 // Customer Signup
-
 exports.signup = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -18,40 +22,53 @@ exports.signup = async (req, res) => {
     $or: [{ email: req.body.email }, { phone: req.body.phone }]
   })
     .then(count => {
+      //if count.length is > 0 it implies that email or phone is already registered
       if (count.length > 0) {
         res.json({
           status: "failed",
           message: "Email or Phone Already Exists"
         });
       } else {
+        //creat customer object
         const customer = new Customer({
           first_name: req.body.first_name,
           last_name: req.body.last_name,
           email: req.body.email,
           password: req.body.password,
-          phone: req.body.phone,
-          verified: false
+          phone: req.body.phone
         });
 
         // Register Customer
-
-        customer
-          .save()
-          .then(result => {
-            res.json({
-              status: "success",
-              message: "Customer Registered Successfully",
-              data: result
-            });
-          })
-          .catch(err => {
-            res.json({
-              status: "error",
-              message: "Something went wrong",
-              error: err
-            });
-          });
+        return customer.save();
       }
+    })
+    .then(customer => {
+      // Create a verification token for this Customer
+      const token = new Token({
+        _userId: customer.id,
+        token: crypto.randomBytes(16).toString("hex")
+      });
+
+      return token.save();
+    })
+    .then(tokenObj => {
+      res.json({
+        status: "success",
+        message:
+          "Customer Registered Successfully, A verification email has will be sent",
+        data: tokenObj._userId
+      });
+      return transporter.sendMail({
+        to: req.body.email,
+        from: "info@catersmart.in",
+        subject: "Welcome " + req.body.first_name,
+        html: `
+        <p>Click this <a href="http://${req.headers.host}/api/email_confirmation/${tokenObj.token}">link</a> to verify your email.</p>
+       `
+      });
+    })
+    .then(result => {
+      console.log(result);
     })
     .catch(err => {
       res.json({
@@ -197,6 +214,58 @@ exports.delete_customer = async (req, res) => {
           message: "Customer Not Found"
         });
       }
+    })
+    .catch(err => {
+      res.json({
+        status: "error",
+        message: "Something went wrong",
+        error: err
+      });
+    });
+};
+
+exports.customer_confirm_email = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({
+      message: "Server side validation failed",
+      errors: errors.array()
+    });
+  }
+  await Token.findOne({ token: req.params.token })
+    .then(tokenObj => {
+      if (!tokenObj) {
+        res.json({
+          status: "failed",
+          message: "Token expired or unable to find it."
+        });
+        return;
+      }
+      return Customer.findOne({ _id: tokenObj._userId });
+    })
+    .then(customer => {
+      if (!customer) {
+        res.json({
+          status: "failed",
+          message: "Customer Not Found"
+        });
+        return;
+      }
+      if (customer.verified) {
+        res.json({
+          status: 400,
+          message: "Customer already been verified"
+        });
+        return;
+      }
+      customer.verified = true;
+      return customer.save();
+    })
+    .then(() => {
+      res.json({
+        status: "success",
+        message: "Customer successfully verified"
+      });
     })
     .catch(err => {
       res.json({
