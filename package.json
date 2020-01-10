@@ -10,12 +10,21 @@
   "author": "Arslan Ahmed",
   "license": "ISC",
   "dependencies": {
+    "admin-bro": "^1.6.0",
+    "admin-bro-expressjs": "^0.4.0",
+    "admin-bro-mongoose": "^0.3.1",
     "body-parser": "^1.19.0",
     "cloudinary": "^1.17.0",
+    "cookie-parser": "^1.4.4",
     "express": "^4.17.1",
+    "express-formidable": "^1.2.0",
+    "express-session": "^1.17.0",
     "express-validator": "^6.3.0",
+    "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.7.12",
     "multer": "^1.4.2",
+    "nodemailer": "^6.4.2",
+    "nodemailer-sendgrid-transport": "^0.2.0",
     "path": "^0.12.7"
   },
   "devDependencies": {

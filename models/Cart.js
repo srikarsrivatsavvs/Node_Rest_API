@@ -12,4 +12,4 @@ let cartSchema = new Schema({
   menu_id: { type: String, required: true },
   quantity: { type: Number, required: true }
 });
-module.exports = mongoose.model("cart", cartSchema);
+module.exports = mongoose.model("Cart", cartSchema);

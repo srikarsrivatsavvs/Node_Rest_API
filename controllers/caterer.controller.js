@@ -1,5 +1,7 @@
 //import Caterer model
 const Caterer = require("../models/Caterer");
+//jsonwebtokens module for generating auth tokens
+const jwt = require("jsonwebtoken");
 // module to upload images to the cloudinary
 const cloudinary = require("cloudinary");
 //module to catch request validation Result
@@ -73,6 +75,7 @@ exports.signup = async (req, res) => {
           password: req.body.password,
           phone: req.body.phone,
           minimum_order_quantity: req.body.minimum_order_quantity,
+          lead_time: req.body.lead_time,
           availability: req.body.availability,
           menu_starting_from: req.body.menu_starting_from,
           delivery_fee: req.body.delivery_fee,
@@ -113,15 +116,28 @@ exports.signup = async (req, res) => {
 
 exports.login = async (req, res) => {
   await Caterer.findOne({
-    $and: [{ email: req.body.email }, { password: req.body.password }]
+    $or: [
+      {
+        $and: [{ email: req.body.email }, { password: req.body.password }]
+      },
+      {
+        $and: [{ phone: req.body.phone }, { password: req.body.password }]
+      }
+    ]
   })
     .then(result => {
       if (result) {
+        const token = jwt.sign(
+          { email: result.email, userId: result._id },
+          "secret",
+          { expiresIn: "1h" }
+        );
         // If Caterer Exists
         res.json({
           status: "success",
           message: "Login Successfull",
-          data: result
+          token: token,
+          userId: result._id.toString()
         });
       } else {
         // If Caterer doesn't Exists
@@ -144,7 +160,7 @@ exports.login = async (req, res) => {
 // Caterer Details
 
 exports.caterer_details = async (req, res) => {
-  await Caterer.findOne({ _id: req.params.id })
+  await Caterer.findOne({ _id: req.userId })
     .then(result => {
       if (result) {
         res.json({
@@ -200,7 +216,7 @@ exports.update_caterer = async (req, res) => {
     });
   }
   await Caterer.findByIdAndUpdate(
-    req.params.id,
+    req.userId,
     { $set: req.body },
     (err, caterer) => {
       if (err) {
@@ -229,7 +245,7 @@ exports.update_caterer = async (req, res) => {
 // Delete Caterer
 
 exports.delete_caterer = async (req, res) => {
-  await Caterer.findByIdAndDelete(req.params.id)
+  await Caterer.findByIdAndDelete(req.userId)
     .then(result => {
       if (result) {
         res.json({
