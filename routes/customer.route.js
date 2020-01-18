@@ -1,7 +1,7 @@
 module.exports = app => {
   const customer_controller = require("../controllers/customer.controller");
   const Customer = require("../models/Customer");
-  const { body } = require("express-validator");
+  const { check, body } = require("express-validator");
   const isAuth = require("../middleware/is-auth");
   // Customer Registration
   app.post(
@@ -20,10 +20,17 @@ module.exports = app => {
         "password",
         "Password should be combination of one uppercase , one lower case, one special char, one digit and min 8 , max 15 char long"
       ).matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/, "i"),
-      body("email", "Enter valid email").isEmail(),
+      body("email", "Enter valid email")
+        .isEmail()
+        .custom(email => {
+          return Customer.findByEmail(email);
+        }),
       body("phone", "Enter a valid phone number")
         .isMobilePhone()
         .isLength({ min: 10, max: 10 })
+        .custom(phone => {
+          return Customer.findByPhone(phone);
+        })
     ],
     customer_controller.signup
   );
@@ -48,6 +55,13 @@ module.exports = app => {
     //Authentication middleware
     isAuth,
     customer_controller.customer_details
+  );
+
+  // Customer email verification
+  app.get(
+    "/api/email_confirmation/:token",
+    [check("token").isAlphanumeric()],
+    customer_controller.customer_confirm_email
   );
 
   // All Customers
