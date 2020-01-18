@@ -68,6 +68,13 @@ exports.signup = async (req, res) => {
 
 // Login Existing Customer
 exports.login = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({
+      message: "Server side validation failed",
+      errors: errors.array()
+    });
+  }
   await Customer.findOne({
     $or: [
       {
@@ -159,6 +166,18 @@ exports.customers = async (req, res) => {
 
 // Update Customer
 exports.update_customer = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({
+      message: "Server side validation failed",
+      errors: errors.array()
+    });
+  }
+  //if email field is updated
+  if (req.body.email) {
+    //then set verified field to false
+    req.body.verified = false;
+  }
   await Customer.findByIdAndUpdate(
     req.userId,
     { $set: req.body },
@@ -171,10 +190,47 @@ exports.update_customer = async (req, res) => {
         });
       } else {
         if (customer) {
-          res.json({
-            status: "success",
-            message: "Customer Updated Successfully"
-          });
+          if (customer.verified) {
+            res.json({
+              status: "success",
+              message: "Customer Updated Successfully"
+            });
+          } else {
+            // Create a verification token for this Customer
+            const token = new Token({
+              _userId: customer.id,
+              token: crypto.randomBytes(16).toString("hex")
+            });
+
+            token
+              .save()
+              .then(tokenObj => {
+                res.json({
+                  status: "success",
+                  message:
+                    "Customer Updated Successfully, A verification email has will be sent",
+                  id: tokenObj._userId
+                });
+                return transporter.sendMail({
+                  to: req.body.email,
+                  from: "info@catersmart.in",
+                  subject: "Welcome " + req.body.first_name,
+                  html: `
+                <p>Click this <a href="http://${req.headers.host}/api/email_confirmation/${tokenObj.token}">link</a> to verify your email.</p>
+               `
+                });
+              })
+              .then(result => {
+                console.log(result);
+              })
+              .catch(err => {
+                res.json({
+                  status: "error",
+                  message: "Something went wrong",
+                  error: err
+                });
+              });
+          }
         } else {
           res.json({
             status: "failed",

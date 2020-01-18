@@ -1,24 +1,24 @@
-module.exports = (app) => {
-    const order_controller = require('../controllers/order.controller');
+module.exports = app => {
+  const order_controller = require("../controllers/order.controller");
+  const isAuth = require("../middleware/is-auth");
+  // Create Order
+  app.post("/api/create_order", order_controller.create_order);
 
-    // Create Order
-    app.post('/api/create_order', order_controller.create_order);
+  // Fetch All Orders
+  app.get("/api/orders", order_controller.orders);
 
-    // Fetch All Orders
-    app.get('/api/orders', order_controller.orders);
+  // Order Details
+  app.get("/api/order/:id", order_controller.order_details);
 
-    // Order Details
-    app.get('/api/order/:id', order_controller.order_details);
+  // Customer Orders
+  app.get("/api/customer_orders/", isAuth, order_controller.customer_orders);
 
-    // Customer Orders
-    app.get('/api/customer_orders/:id', order_controller.customer_orders);
+  // Caterer Orders
+  app.get("/api/caterer_orders/:id", order_controller.caterer_orders);
 
-    // Caterer Orders
-    app.get('/api/caterer_orders/:id', order_controller.caterer_orders);
+  // Update Order Status
+  app.put("/api/update_order/:id", order_controller.update_order);
 
-    // Update Order Status
-    app.put('/api/update_order/:id', order_controller.update_order);
-
-    // Delete Order
-    app.put('/api/delete_order/:id', order_controller.delete_order);
-}
+  // Delete Order
+  app.put("/api/delete_order/:id", order_controller.delete_order);
+};
