@@ -24,4 +24,30 @@ const customerSchema = new Schema({
   resetTokenExpiration: { type: Date }
 });
 
+customerSchema.statics.findByEmail = function(email) {
+  return this.find({ email: email }).then(result => {
+    //if count.length is > 0 it implies that email or phone is already registered
+    if (result.length > 0) {
+      //
+      return Promise.reject("Email already registered");
+    } else {
+      //
+      return true;
+    }
+  });
+};
+
+customerSchema.statics.findByPhone = function(phone) {
+  return this.find({ phone: phone }).then(result => {
+    //if count.length is > 0 it implies that email or phone is already registered
+    if (result.length > 0) {
+      //
+      return Promise.reject("Phone already registered");
+    } else {
+      //
+      return true;
+    }
+  });
+};
+
 module.exports = mongoose.model("Customer", customerSchema);
