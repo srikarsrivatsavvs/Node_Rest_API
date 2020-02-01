@@ -44,7 +44,7 @@ catererSchema.statics.isPhoneRegistered = function(phone) {
   });
 };
 
-catererSchema.statics.isCustomerEmail = function(email) {
+catererSchema.statics.isCatererEmail = function(email) {
   return this.find({ email: email }).then(result => {
     //if count.length is > 0 it implies that email or phone is already registered
     if (result.length > 0) {
@@ -57,7 +57,7 @@ catererSchema.statics.isCustomerEmail = function(email) {
   });
 };
 
-catererSchema.statics.isCustomerPhone = function(phone) {
+catererSchema.statics.isCatererPhone = function(phone) {
   return this.find({ phone: phone }).then(result => {
     //if count.length is > 0 it implies that email or phone is already registered
     if (result.length > 0) {

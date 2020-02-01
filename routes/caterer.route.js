@@ -54,7 +54,7 @@ module.exports = app => {
         .isMobilePhone()
         .isLength({ min: 10, max: 10 })
         .custom(email => {
-          return Caterer.isCustomerPhone(email);
+          return Caterer.isCatererPhone(email);
         }),
       body(
         "password",
@@ -63,7 +63,7 @@ module.exports = app => {
       body("email", "Enter valid registered email")
         .if(body("email").exists())
         .custom(email => {
-          return Caterer.isCustomerEmail(email);
+          return Caterer.isCatererEmail(email);
         })
     ],
     caterer_controller.login
@@ -78,7 +78,7 @@ module.exports = app => {
   );
 
   // All caterers
-  // app.get("/api/caterers", caterer_controller.caterers);
+  app.get("/api/caterers", caterer_controller.caterers);
 
   // Update caterer
   app.put(

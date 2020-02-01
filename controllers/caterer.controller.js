@@ -166,7 +166,7 @@ exports.login = async (req, res) => {
 
 // Caterer Details
 exports.caterer_details = async (req, res) => {
-  await Caterer.findOne({ _id: req.userId })
+  await Caterer.findOne({ _id: req.body.userId })
     .then(result => {
       if (result) {
         res.json({
@@ -222,7 +222,7 @@ exports.update_caterer = async (req, res) => {
     });
   }
   await Caterer.findByIdAndUpdate(
-    req.userId,
+    req.body.userId,
     { $set: req.body },
     (err, caterer) => {
       if (err) {
@@ -251,7 +251,7 @@ exports.update_caterer = async (req, res) => {
 // Delete Caterer
 
 exports.delete_caterer = async (req, res) => {
-  await Caterer.findByIdAndDelete(req.userId)
+  await Caterer.findByIdAndDelete(req.body.userId)
     .then(result => {
       if (result) {
         res.json({

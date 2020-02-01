@@ -120,7 +120,7 @@ exports.login = async (req, res) => {
 
 // Customer Details
 exports.customer_details = async (req, res) => {
-  await Customer.findOne({ _id: req.userId })
+  await Customer.findOne({ _id: req.body.userId })
     .then(result => {
       if (result) {
         res.json({
@@ -179,7 +179,7 @@ exports.update_customer = async (req, res) => {
     req.body.verified = false;
   }
   await Customer.findByIdAndUpdate(
-    req.userId,
+    req.body.userId,
     { $set: req.body },
     (err, customer) => {
       if (err) {
@@ -244,7 +244,7 @@ exports.update_customer = async (req, res) => {
 
 // Delete Customer
 exports.delete_customer = async (req, res) => {
-  await Customer.findByIdAndDelete(req.userId)
+  await Customer.findByIdAndDelete(req.body.userId)
     .then(result => {
       if (result) {
         res.json({
