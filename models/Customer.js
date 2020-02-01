@@ -24,7 +24,7 @@ const customerSchema = new Schema({
   resetTokenExpiration: { type: Date }
 });
 
-customerSchema.statics.findByEmail = function(email) {
+customerSchema.statics.isEmailRegistered = function(email) {
   return this.find({ email: email }).then(result => {
     //if count.length is > 0 it implies that email or phone is already registered
     if (result.length > 0) {
@@ -37,7 +37,7 @@ customerSchema.statics.findByEmail = function(email) {
   });
 };
 
-customerSchema.statics.findByPhone = function(phone) {
+customerSchema.statics.isPhoneRegistered = function(phone) {
   return this.find({ phone: phone }).then(result => {
     //if count.length is > 0 it implies that email or phone is already registered
     if (result.length > 0) {
@@ -46,6 +46,32 @@ customerSchema.statics.findByPhone = function(phone) {
     } else {
       //
       return true;
+    }
+  });
+};
+
+customerSchema.statics.isCustomerEmail = function(email) {
+  return this.find({ email: email }).then(result => {
+    //if count.length is > 0 it implies that email or phone is already registered
+    if (result.length > 0) {
+      //
+      return true;
+    } else {
+      //
+      return Promise.reject("Email not registered");
+    }
+  });
+};
+
+customerSchema.statics.isCustomerPhone = function(phone) {
+  return this.find({ phone: phone }).then(result => {
+    //if count.length is > 0 it implies that email or phone is already registered
+    if (result.length > 0) {
+      //
+      return true;
+    } else {
+      //
+      return Promise.reject("Phone not registered");
     }
   });
 };

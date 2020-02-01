@@ -23,13 +23,13 @@ module.exports = app => {
       body("email", "Enter valid email")
         .isEmail()
         .custom(email => {
-          return Customer.findByEmail(email);
+          return Customer.isEmailRegistered(email);
         }),
       body("phone", "Enter a valid phone number")
         .isMobilePhone()
         .isLength({ min: 10, max: 10 })
         .custom(phone => {
-          return Customer.findByPhone(phone);
+          return Customer.isPhoneRegistered(phone);
         })
     ],
     customer_controller.signup
@@ -42,7 +42,10 @@ module.exports = app => {
       body("phone", "Enter a valid registered phone number")
         .if(body("phone").exists())
         .isMobilePhone()
-        .isLength({ min: 10, max: 10 }),
+        .isLength({ min: 10, max: 10 })
+        .custom(email => {
+          return Customer.isCustomerPhone(email);
+        }),
       body(
         "password",
         "Password should be combination of one uppercase , one lower case, one special char, one digit and min 8 , max 15 char long"
@@ -50,7 +53,7 @@ module.exports = app => {
       body("email", "Enter valid registered email")
         .if(body("email").exists())
         .custom(email => {
-          return Customer.findByEmail(email);
+          return Customer.isCustomerEmail(email);
         })
     ],
     customer_controller.login

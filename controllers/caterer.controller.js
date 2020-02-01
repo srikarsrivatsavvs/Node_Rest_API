@@ -113,8 +113,14 @@ exports.signup = async (req, res) => {
 };
 
 // Caterer Login
-
 exports.login = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({
+      message: "Server side validation failed",
+      errors: errors.array()
+    });
+  }
   await Caterer.findOne({
     $or: [
       {
@@ -126,6 +132,7 @@ exports.login = async (req, res) => {
     ]
   })
     .then(result => {
+      // console.log(result);
       if (result) {
         const token = jwt.sign(
           { email: result.email, userId: result._id },
@@ -158,7 +165,6 @@ exports.login = async (req, res) => {
 };
 
 // Caterer Details
-
 exports.caterer_details = async (req, res) => {
   await Caterer.findOne({ _id: req.userId })
     .then(result => {

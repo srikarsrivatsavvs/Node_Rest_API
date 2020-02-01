@@ -17,4 +17,57 @@ let catererSchema = new Schema({
   live_kitchen: { type: Boolean, required: true },
   image: { type: String, required: true }
 });
+
+catererSchema.statics.isEmailRegistered = function(email) {
+  return this.find({ email: email }).then(result => {
+    //if count.length is > 0 it implies that email or phone is already registered
+    if (result.length > 0) {
+      //
+      return Promise.reject("Email already registered");
+    } else {
+      //
+      return true;
+    }
+  });
+};
+
+catererSchema.statics.isPhoneRegistered = function(phone) {
+  return this.find({ phone: phone }).then(result => {
+    //if count.length is > 0 it implies that email or phone is already registered
+    if (result.length > 0) {
+      //
+      return Promise.reject("Phone already registered");
+    } else {
+      //
+      return true;
+    }
+  });
+};
+
+catererSchema.statics.isCustomerEmail = function(email) {
+  return this.find({ email: email }).then(result => {
+    //if count.length is > 0 it implies that email or phone is already registered
+    if (result.length > 0) {
+      //
+      return true;
+    } else {
+      //
+      return Promise.reject("Email not registered");
+    }
+  });
+};
+
+catererSchema.statics.isCustomerPhone = function(phone) {
+  return this.find({ phone: phone }).then(result => {
+    //if count.length is > 0 it implies that email or phone is already registered
+    if (result.length > 0) {
+      //
+      return true;
+    } else {
+      //
+      return Promise.reject("Phone not registered");
+    }
+  });
+};
+
 module.exports = mongoose.model("Caterer", catererSchema);
