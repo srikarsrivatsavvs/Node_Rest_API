@@ -113,8 +113,14 @@ exports.signup = async (req, res) => {
 };
 
 // Caterer Login
-
 exports.login = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({
+      message: "Server side validation failed",
+      errors: errors.array()
+    });
+  }
   await Caterer.findOne({
     $or: [
       {
@@ -126,6 +132,7 @@ exports.login = async (req, res) => {
     ]
   })
     .then(result => {
+      // console.log(result);
       if (result) {
         const token = jwt.sign(
           { email: result.email, userId: result._id },
@@ -158,9 +165,8 @@ exports.login = async (req, res) => {
 };
 
 // Caterer Details
-
 exports.caterer_details = async (req, res) => {
-  await Caterer.findOne({ _id: req.userId })
+  await Caterer.findOne({ _id: req.body.userId })
     .then(result => {
       if (result) {
         res.json({
@@ -216,7 +222,7 @@ exports.update_caterer = async (req, res) => {
     });
   }
   await Caterer.findByIdAndUpdate(
-    req.userId,
+    req.body.userId,
     { $set: req.body },
     (err, caterer) => {
       if (err) {
@@ -245,7 +251,7 @@ exports.update_caterer = async (req, res) => {
 // Delete Caterer
 
 exports.delete_caterer = async (req, res) => {
-  await Caterer.findByIdAndDelete(req.userId)
+  await Caterer.findByIdAndDelete(req.body.userId)
     .then(result => {
       if (result) {
         res.json({
