@@ -1,6 +1,15 @@
 const Cart = require("../models/Cart");
+//module to catch request validation Result
+const { validationResult } = require("express-validator");
 
 exports.add_item = (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({
+      message: "Server side validation failed",
+      errors: errors.array()
+    });
+  }
   const item = {
     menu_id: req.body.menu_id,
     quantity: req.body.quantity
@@ -49,6 +58,13 @@ exports.add_item = (req, res) => {
 };
 
 exports.remove_item = (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({
+      message: "Server side validation failed",
+      errors: errors.array()
+    });
+  }
   const item = {
     menu_id: req.body.menu_id
   };
