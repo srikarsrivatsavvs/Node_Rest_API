@@ -9,7 +9,15 @@ let cartSchema = new Schema({
     ref: "Customers",
     required: true
   },
-  menu_id: { type: String, required: true },
-  quantity: { type: Number, required: true }
+  cartItems: [
+    {
+      menu_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Menu",
+        required: true
+      },
+      quantity: { type: Number, required: true }
+    }
+  ]
 });
 module.exports = mongoose.model("Cart", cartSchema);

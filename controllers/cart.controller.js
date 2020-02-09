@@ -1,19 +1,82 @@
 const Cart = require("../models/Cart");
 
 exports.add_item = (req, res) => {
-  let cart = new Cart({
-    customer_id: req.body.customer_id,
+  const item = {
     menu_id: req.body.menu_id,
     quantity: req.body.quantity
-  });
-
-  cart
-    .save()
-    .then(result => {
+  };
+  Cart.findOne({ customer_id: req.body.userId })
+    .then(cartObj => {
+      if (cartObj) {
+        // console.log(cartObj.cartItems);
+        // check if cartItems is empty
+        if (cartObj.cartItems.length) {
+          if (
+            cartObj.cartItems.some(element => element.menu_id == item.menu_id)
+          ) {
+            let index = cartObj.cartItems.findIndex(
+              i => i.menu_id == item.menu_id
+            );
+            cartObj.cartItems[index].quantity = item.quantity;
+          } else {
+            cartObj.cartItems.push(item);
+          }
+        } else {
+          cartObj.cartItems.push(item);
+        }
+        return cartObj.save();
+      } else {
+        res.json({
+          status: "failed",
+          message: "Cart Not Found"
+        });
+      }
+    })
+    .then(cart => {
       res.json({
         status: "success",
         message: "Menu Added to Cart",
-        data: result
+        data: cart
+      });
+    })
+    .catch(err => {
+      res.json({
+        status: "error",
+        message: "Something went wrong",
+        error: err
+      });
+    });
+};
+
+exports.remove_item = (req, res) => {
+  const item = {
+    menu_id: req.body.menu_id
+  };
+  Cart.findOne({ customer_id: req.body.userId })
+    .then(cartObj => {
+      if (cartObj) {
+        // console.log(cartObj.cartItems);
+        if (
+          cartObj.cartItems.some(element => element.menu_id == item.menu_id)
+        ) {
+          let index = cartObj.cartItems.findIndex(
+            i => i.menu_id == item.menu_id
+          );
+          cartObj.cartItems.splice(index, 1);
+        }
+        return cartObj.save();
+      } else {
+        res.json({
+          status: "failed",
+          message: "Cart Not Found"
+        });
+      }
+    })
+    .then(cart => {
+      res.json({
+        status: "success",
+        message: "Menu Added to Cart",
+        data: cart
       });
     })
     .catch(err => {
@@ -26,41 +89,48 @@ exports.add_item = (req, res) => {
 };
 
 // Item Details
-exports.item_details = async (req, res) => {
-  await Cart.findOne({ _id: req.params.id })
+// exports.item_details = async (req, res) => {
+//   await Cart.findOne({ _id: req.params.id })
+//     .then(result => {
+//       if (result) {
+//         res.json({
+//           status: "success",
+//           message: "Item Found",
+//           data: result
+//         });
+//       } else {
+//         res.json({
+//           status: "failed",
+//           message: "No Item Found",
+//           data: result
+//         });
+//       }
+//     })
+//     .catch(err => {
+//       res.json({
+//         status: "error",
+//         message: "Something went wrong",
+//         error: err
+//       });
+//     });
+// };
+
+// Customer Cart Items
+exports.cart_items = async (req, res) => {
+  await Cart.findOne({ customer_id: req.body.userId })
     .then(result => {
       if (result) {
         res.json({
           status: "success",
-          message: "Item Found",
-          data: result
+          message: result.cartItems.length + " Items Found",
+          data: result.cartItems
         });
       } else {
         res.json({
           status: "failed",
-          message: "No Item Found",
-          data: result
+          message: "Cart Not Found"
         });
       }
-    })
-    .catch(err => {
-      res.json({
-        status: "error",
-        message: "Something went wrong",
-        error: err
-      });
-    });
-};
-
-// Customer Cart Items
-exports.cart_items = async (req, res) => {
-  await Cart.find({ customer_id: req.userId })
-    .then(result => {
-      res.json({
-        status: "success",
-        message: result.length + " Items Found",
-        data: result
-      });
     })
     .catch(err => {
       res.json({
@@ -72,49 +142,53 @@ exports.cart_items = async (req, res) => {
 };
 
 // Update Cart Item
-exports.update_cart = async (req, res) => {
-  await Cart.findByIdAndUpdate(
-    req.params.itemId,
-    { $set: req.body },
-    (err, cart) => {
-      if (err) {
-        res.json({
-          status: "error",
-          message: "Something went wrong",
-          error: err
-        });
-      } else {
-        if (cart) {
-          res.json({
-            status: "success",
-            message: "Cart Item Updated Successfully"
-          });
-        } else {
-          res.json({
-            status: "failed",
-            message: "Cart Item Not Found"
-          });
-        }
-      }
-    }
-  );
-};
+// exports.update_cart = async (req, res) => {
+//   await Cart.findByIdAndUpdate(
+//     req.params.itemId,
+//     { $set: req.body },
+//     (err, cart) => {
+//       if (err) {
+//         res.json({
+//           status: "error",
+//           message: "Something went wrong",
+//           error: err
+//         });
+//       } else {
+//         if (cart) {
+//           res.json({
+//             status: "success",
+//             message: "Cart Item Updated Successfully"
+//           });
+//         } else {
+//           res.json({
+//             status: "failed",
+//             message: "Cart Item Not Found"
+//           });
+//         }
+//       }
+//     }
+//   );
+// };
 
 // Delete Cart Item
-exports.delete_cart = async (req, res) => {
-  await Cart.findByIdAndDelete(req.params.itemId)
-    .then(result => {
-      if (result) {
-        res.json({
-          status: "success",
-          message: "Cart Item Deleted Successfully"
-        });
+exports.empty_cart = async (req, res) => {
+  await Cart.findOne(req.body.userId)
+    .then(cartObj => {
+      if (cartObj) {
+        cartObj.cartItems = [];
+        return cartObj.save();
       } else {
         res.json({
           status: "failed",
-          message: "Cart Item Not Found"
+          message: "Cart Not Found"
         });
       }
+    })
+    .then(cartObj => {
+      res.json({
+        status: "success",
+        message: "Cart empty"
+      });
     })
     .catch(err => {
       res.json({
