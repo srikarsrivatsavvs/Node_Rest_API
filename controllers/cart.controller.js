@@ -91,7 +91,7 @@ exports.remove_item = (req, res) => {
     .then(cart => {
       res.json({
         status: "success",
-        message: "Menu Added to Cart",
+        message: "Menu removed from Cart",
         data: cart
       });
     })
@@ -139,7 +139,7 @@ exports.cart_items = async (req, res) => {
         res.json({
           status: "success",
           message: result.cartItems.length + " Items Found",
-          data: result.cartItems
+          cart: result
         });
       } else {
         res.json({
@@ -188,7 +188,7 @@ exports.cart_items = async (req, res) => {
 
 // Delete Cart Item
 exports.empty_cart = async (req, res) => {
-  await Cart.findOne(req.body.userId)
+  await Cart.findOne({ customer_id: req.body.userId })
     .then(cartObj => {
       if (cartObj) {
         cartObj.cartItems = [];

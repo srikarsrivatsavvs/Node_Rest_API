@@ -34,5 +34,6 @@ module.exports = (req, res, next) => {
     throw error;
   }
   req.body.userId = decodedToken.userId;
+  req.email = decodedToken.email;
   next();
 };
