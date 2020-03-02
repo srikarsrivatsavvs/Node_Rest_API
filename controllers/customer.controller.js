@@ -1,5 +1,6 @@
 const Customer = require("../models/Customer");
 const Token = require("../models/Token");
+const Cart = require("../models/Cart");
 //jsonwebtokens module for generating auth tokens
 const jwt = require("jsonwebtoken");
 //validationResult for catching validation erros from express-validator middleware
@@ -30,6 +31,15 @@ exports.signup = async (req, res) => {
   await customer
     .save()
     .then(customer => {
+      // Create an empty cart for the customer
+      const cart = new Cart({
+        customer_id: customer.id,
+        cartItems: []
+      });
+
+      return cart.save();
+    })
+    .then(cartObj => {
       // Create a verification token for this Customer
       const token = new Token({
         _userId: customer.id,
@@ -120,13 +130,13 @@ exports.login = async (req, res) => {
 
 // Customer Details
 exports.customer_details = async (req, res) => {
-  await Customer.findOne({ _id: req.body.userId })
-    .then(result => {
-      if (result) {
+  await Customer.findById(req.body.userId)
+    .then(customer => {
+      if (customer) {
         res.json({
           status: "success",
           message: "Customer Found",
-          data: result
+          data: customer
         });
       } else {
         res.json({
@@ -247,9 +257,11 @@ exports.delete_customer = async (req, res) => {
   await Customer.findByIdAndDelete(req.body.userId)
     .then(result => {
       if (result) {
-        res.json({
-          status: "success",
-          message: "Customer Deleted Successfully"
+        Cart.findOneAndRemove({ customer_id: req.body.userId }).then(result => {
+          res.json({
+            status: "success",
+            message: "Customer Deleted Successfully"
+          });
         });
       } else {
         res.json({

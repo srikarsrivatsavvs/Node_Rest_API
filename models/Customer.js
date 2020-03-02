@@ -3,14 +3,14 @@ const Schema = mongoose.Schema;
 
 mongoose.set("useFindAndModify", false);
 
-const cartSchema = new Schema({
-  menu_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Menu",
-    required: true
-  },
-  quantity: { type: Number, required: true }
-});
+// const cartSchema = new Schema({
+//   menu_id: {
+//     type: mongoose.Schema.Types.ObjectId,
+//     ref: "Menu",
+//     required: true
+//   },
+//   quantity: { type: Number, required: true }
+// });
 
 const customerSchema = new Schema({
   first_name: { type: String, required: true },
@@ -19,7 +19,7 @@ const customerSchema = new Schema({
   password: { type: String, required: true },
   phone: { type: String, required: true },
   verified: { type: Boolean, required: true, default: false },
-  cart: [cartSchema],
+  // cart: [cartSchema],
   resetToken: { type: String },
   resetTokenExpiration: { type: Date }
 });
