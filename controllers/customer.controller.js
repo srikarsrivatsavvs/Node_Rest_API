@@ -49,10 +49,16 @@ exports.signup = async (req, res) => {
       return token.save();
     })
     .then(tokenObj => {
+      const authToken = jwt.sign(
+        { email: customer.email, userId: customer.id },
+        "secret",
+        { expiresIn: "1h" }
+      );
       res.json({
         status: "success",
         message:
           "Customer Registered Successfully, A verification email has will be sent",
+        token: authToken,
         id: tokenObj._userId
       });
       return transporter.sendMail({
